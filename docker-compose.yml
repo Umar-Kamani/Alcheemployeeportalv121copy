@@ -30,7 +30,7 @@ services:
       DB_PASS: password123
       DB_NAME: security_app
       PORT: 3001
-      JWT_SECRET: your-secret-jwt-key-change-in-production
+      JWT_SECRET: a345b99c128e121f0efc396945de734d
     ports:
       - "3001:3001"
     depends_on:
