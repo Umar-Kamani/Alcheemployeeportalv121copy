@@ -5,10 +5,12 @@ import pool from '../db';
 
 const router = Router();
 
+// POST /api/auth/login
 router.post('/login', async (req, res) => {
   try {
     const { username, password } = req.body;
 
+    // Check if user exists
     const result = await pool.query(
       'SELECT * FROM users WHERE username = $1',
       [username]
@@ -19,18 +21,21 @@ router.post('/login', async (req, res) => {
     }
 
     const user = result.rows[0];
-    const isValid = await bcrypt.compare(password, user.password);
 
+    // Compare password
+    const isValid = await bcrypt.compare(password, user.password);
     if (!isValid) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
+    // Sign JWT
     const token = jwt.sign(
       { id: user.id, username: user.username, role: user.role },
       process.env.JWT_SECRET || 'secret',
       { expiresIn: '24h' }
     );
 
+    // Send response
     res.json({
       user: {
         id: user.id,
@@ -46,3 +51,4 @@ router.post('/login', async (req, res) => {
 });
 
 export default router;
+

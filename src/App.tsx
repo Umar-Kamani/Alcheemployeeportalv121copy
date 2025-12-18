@@ -94,14 +94,16 @@ export default function App() {
   });
 
   // Load all data from backend
-  const loadAllData = async () => {
+  const loadAllData = async (userRole?: string) => {
     try {
       setLoading(true);
       setError(null);
 
-      // Load users
-      const usersData = await UsersAPI.getAll();
-      setUsers(usersData.map(transformUser));
+      // Load users only if the user is a superadmin
+      if (userRole === 'superadmin' || userRole === 'admin') {
+        const usersData = await UsersAPI.getAll();
+        setUsers(usersData.map(transformUser));
+      }
 
       // Load employees
       const employeesData = await EmployeesAPI.getAll();
@@ -134,7 +136,7 @@ export default function App() {
     if (token && savedUser) {
       const user = JSON.parse(savedUser);
       setCurrentUser(user);
-      loadAllData();
+      loadAllData(user.role);
     } else {
       setLoading(false);
     }
@@ -175,7 +177,7 @@ export default function App() {
     setAccessLogs([...accessLogs, newLog]);
 
     // Load all data after successful login
-    await loadAllData();
+    await loadAllData(user.role);
   };
 
   const handleLogout = () => {
